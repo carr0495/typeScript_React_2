@@ -1,11 +1,23 @@
 import React, { FC, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import firebase from "firebase";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Input, Button } from "../components";
 
 const App: FC = (props) => {
   const [email, setEmail] = useState<string | null>(null);
   const [password, setPassword] = useState<string | null>(null);
+
+  const login = async () => {
+    if (email && password) {
+      const { user } = await firebase
+        .auth()
+        .signInWithEmailAndPassword(email, password);
+    } else {
+      Alert.alert("Missing Fields");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Input placeholder="Email" OnChangeText={(text) => setEmail(text)} />
@@ -14,7 +26,7 @@ const App: FC = (props) => {
         OnChangeText={(text) => setPassword(text)}
         secureTextEntry
       />
-      <Button title="Login" onPress={() => alert("pressed")} />
+      <Button title="Login" onPress={login} />
       <View style={styles.loginText}>
         <Text style={{ marginHorizontal: 5 }}>Don't Have an Account?</Text>
         <TouchableOpacity

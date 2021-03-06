@@ -1,6 +1,7 @@
 import { useLinkProps } from "@react-navigation/native";
+import firebase from "firebase";
 import React, { FC, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Input, Button } from "../components";
 
@@ -8,6 +9,28 @@ const App: FC = (props) => {
   const [name, setName] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [password, setPassword] = useState<string | null>(null);
+
+  const signUp = async () => {
+    if (name && email && password) {
+      try {
+        const user = await firebase
+          .auth()
+          .createUserWithEmailAndPassword(email, password);
+
+        if (user) {
+          await firebase
+            .firestore()
+            .collection("users")
+            .doc(user.user?.uid)
+            .set({ name, email, password });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      Alert.alert("Error", "Missing Fields");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -19,7 +42,7 @@ const App: FC = (props) => {
         OnChangeText={(text) => setPassword(text)}
         secureTextEntry
       />
-      <Button title="Sign Up" onPress={() => alert("pressed")} />
+      <Button title="Sign Up" onPress={signUp} />
       <View style={styles.loginText}>
         <Text style={{ marginHorizontal: 5 }}>Already Have an Account?</Text>
         <TouchableOpacity

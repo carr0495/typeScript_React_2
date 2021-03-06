@@ -10,7 +10,7 @@ const MainNav: FC = () => {
   const checkAuth = () => {
     firebase.auth().onAuthStateChanged((_user) => {
       if (_user) {
-        setUser(user);
+        setUser(_user);
       }
     });
   };
